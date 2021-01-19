@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ public class DataSet {
 
     private static HashMap<String, ArrayList<Integer>> dataset = new HashMap<>();
     private static HashMap<String, Double> gini = new HashMap<>();
+    private static HashMap<String, ArrayList<Integer>> datosP = new HashMap<>();
 
     public static void cargarDatos(String nombre) {
         try {
@@ -83,12 +85,50 @@ public class DataSet {
         }
     }
 
-    public static void segmentarData(String atributo) {
+    public static HashMap<String, ArrayList<Integer>> segmentarData(String atributo) {
         actualizarGini(atributo);
         String min = buscarMin();
         System.out.println(min);
 
+        return datosPositivos(min);
     }
+
+    private static HashMap<String, ArrayList<Integer>> datosPositivos(String atributo) {
+        datosP = (HashMap<String, ArrayList<Integer>>) dataset.clone();
+        
+        for(Map.Entry<String,ArrayList<Integer>> entry:datosP.entrySet()){
+           ArrayList<Integer> min = datosP.get(atributo);
+           for (int i : min){
+               for(Integer datos:entry.getValue()){
+                   if( i == 1 ){
+                       datosP.put(entry.getKey(), entry.getValue());
+                       System.out.println(entry.getKey() + "   "+ entry.getValue());
+                   }
+               }
+           } 
+           
+        }
+        return null;
+    }
+    
+        private static HashMap<String, ArrayList<Integer>> datosNegativos(String atributo) {
+        datosP = (HashMap<String, ArrayList<Integer>>) dataset.clone();
+        
+        for(Map.Entry<String,ArrayList<Integer>> entry:datosP.entrySet()){
+           ArrayList<Integer> min = datosP.get(atributo);
+           for (int i : min){
+               for(Integer datos:entry.getValue()){
+                   if( i == 0 ){
+                       datosP.put(entry.getKey(), entry.getValue());
+                   }
+               }
+           } 
+           
+        }
+        return null;
+    }
+    
+    
 
     private static String buscarMin() {
         Double i = 0.0;
@@ -100,9 +140,6 @@ public class DataSet {
             }
 
             if (entry.getValue() < i) {
-
-                System.out.println(entry.getValue());
-                System.out.println(entry.getKey());
                 i = entry.getValue();
                 Key = entry.getKey();
             }
